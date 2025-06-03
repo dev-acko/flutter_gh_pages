@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>📦 App Size Dashboard</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f4f4f4; }
+  </style>
+</head>
+<body>
+  <h1>📦 App Size Report</h1>
+  <div id="content">Loading...</div>
+
+  <script>
+    fetch('app_size.json')
+      .then(res => res.json())
+      .then(data => {
+        const content = document.getElementById('content');
+        const table = `
+          <table>
+            <tr><th>Commit</th><th>Date</th><th>Size (MB)</th></tr>
+            ${data.map(entry => `
+              <tr>
+                <td><code>${entry.commit.slice(0, 7)}</code></td>
+                <td>${entry.date}</td>
+                <td>${(entry.size / 1024 / 1024).toFixed(2)} MB</td>
+              </tr>`).join('')}
+          </table>`;
+        content.innerHTML = table;
+      })
+      .catch(() => {
+        document.getElementById('content').innerText = 'Failed to load size data.';
+      });
+  </script>
+</body>
+</html>
