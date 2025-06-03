@@ -1,12 +1,32 @@
 [
   {
     "commit": "abc123def",
+    "commitMessage": "Feature: Added login animations",
     "date": "2025-06-03",
-    "size": 33059618
+    "size": 33059618,
+    "sizeDiff": 159618,
+    "committer": "Alice",
+    "isRelease": true,
+    "tag": "v2.1.0"
   },
   {
     "commit": "456xyz789",
+    "commitMessage": "Fix: Optimized image loading",
     "date": "2025-05-31",
-    "size": 32900000
+    "size": 32900000,
+    "sizeDiff": -102400,
+    "committer": "Bob",
+    "isRelease": false,
+    "tag": null
+  },
+  {
+    "commit": "999uvw555",
+    "commitMessage": "Feature: Added onboarding flow",
+    "date": "2025-05-28",
+    "size": 33000000,
+    "sizeDiff": 1000000,
+    "committer": "Charlie",
+    "isRelease": false,
+    "tag": null
   }
 ]
