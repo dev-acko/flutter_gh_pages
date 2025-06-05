@@ -5,9 +5,8 @@
     "date": "2025-06-03",
     "size": 33059618,
     "sizeDiff": 159618,
-    "committer": "Alice",
-    "isRelease": true,
-    "tag": "v2.1.0"
+    "committer": "Rahul",
+    "isRelease": true
   },
   {
     "commit": "456xyz789",
@@ -15,9 +14,8 @@
     "date": "2025-05-31",
     "size": 32900000,
     "sizeDiff": -102400,
-    "committer": "Bob",
-    "isRelease": false,
-    "tag": null
+    "committer": "Prabhu",
+    "isRelease": false
   },
   {
     "commit": "999uvw555",
@@ -25,8 +23,7 @@
     "date": "2025-05-28",
     "size": 33000000,
     "sizeDiff": 1000000,
-    "committer": "Charlie",
-    "isRelease": false,
-    "tag": null
+    "committer": "Sharan",
+    "isRelease": false
   }
 ]

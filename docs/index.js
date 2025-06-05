@@ -28,7 +28,7 @@ async function loadData() {
           <td style="color: ${
             entry.sizeDiff > 0 ? 'red' : entry.sizeDiff < 0 ? 'green' : 'gray'
           }">${(entry.sizeDiff / 1024).toFixed(1)}</td>
-          <td>${entry.isRelease ? `✅ ${entry.tag || ''}` : '—'}</td>
+          <td>${entry.isRelease ? '✅' : '—'}</td>
         </tr>
       `
         )

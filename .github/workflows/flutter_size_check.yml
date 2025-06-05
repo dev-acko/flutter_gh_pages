@@ -78,7 +78,6 @@ jobs:
              --argjson sizeDiff ${{ steps.size_diff.outputs.size_diff }} \
              --arg committer "${{ steps.commit_info.outputs.committer }}" \
              --arg isRelease "${{ steps.commit_info.outputs.isRelease }}" \
-             --arg tag "${{ steps.commit_info.outputs.tag }}" \
              '. + [{
                 commit: $commit,
                 commitMessage: $commitMessage,
@@ -86,8 +85,7 @@ jobs:
                 size: $size,
                 sizeDiff: $sizeDiff,
                 committer: $committer,
-                isRelease: ($isRelease == "true"),
-                tag: ($tag == "null" or $tag == null ? null : $tag)
+                isRelease: ($isRelease == "true")
              }]' "$JSON_FILE" > tmp.json && mv tmp.json "$JSON_FILE"
 
       - name: Commit and push app_size.json
