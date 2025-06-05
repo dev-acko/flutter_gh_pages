@@ -18,7 +18,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.3'  # Replace with your local version
+          flutter-version: '3.29.3'  # Replace with your local Flutter version
           channel: stable
 
       - name: Confirm Flutter Version
@@ -27,8 +27,8 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Build APK (release)
-        run: flutter build apk --release
+      - name: Build APK (release) for single ABI
+        run: flutter build apk --release --target-platform android-arm64
 
       - name: Get APK size
         id: apk_size
@@ -77,10 +77,18 @@ jobs:
              --argjson size ${{ steps.apk_size.outputs.apk_size }} \
              --argjson sizeDiff ${{ steps.size_diff.outputs.size_diff }} \
              --arg committer "${{ steps.commit_info.outputs.committer }}" \
-             --argjson isRelease ${{ steps.commit_info.outputs.isRelease }} \
+             --arg isRelease "${{ steps.commit_info.outputs.isRelease }}" \
              --arg tag "${{ steps.commit_info.outputs.tag }}" \
-             '. | [{"commit": $commit, "commitMessage": $commitMessage, "date": $date, "size": $size, "sizeDiff": $sizeDiff, "committer": $committer, "isRelease": $isRelease, "tag": ($tag == "null" ? null : $tag)}] + .' \
-             "$JSON_FILE" > tmp.json && mv tmp.json "$JSON_FILE"
+             '. + [{
+                commit: $commit,
+                commitMessage: $commitMessage,
+                date: $date,
+                size: $size,
+                sizeDiff: $sizeDiff,
+                committer: $committer,
+                isRelease: ($isRelease == "true"),
+                tag: ($tag == "null" or $tag == null ? null : $tag)
+             }]' "$JSON_FILE" > tmp.json && mv tmp.json "$JSON_FILE"
 
       - name: Commit and push app_size.json
         uses: stefanzweifel/git-auto-commit-action@v5
