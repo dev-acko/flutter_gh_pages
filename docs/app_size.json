@@ -25,5 +25,14 @@
     "sizeDiff": 1000000,
     "committer": "Sharan",
     "isRelease": false
+  },
+  {
+    "commit": "1b30a436a83d62e4deb439fb1497e7016e7b1e6c",
+    "commitMessage": "main change",
+    "date": "2025-06-06",
+    "size": 6757774,
+    "sizeDiff": -26301844,
+    "committer": "dev-acko",
+    "isRelease": false
   }
 ]
