@@ -34,5 +34,14 @@
     "sizeDiff": -26301844,
     "committer": "dev-acko",
     "isRelease": false
+  },
+  {
+    "commit": "8c266c0b30ca3a65cd803eab10143855ac4d2670",
+    "commitMessage": "added some images to run size check",
+    "date": "2025-06-06",
+    "size": 6757771,
+    "sizeDiff": -26301847,
+    "committer": "dev-acko",
+    "isRelease": false
   }
 ]
