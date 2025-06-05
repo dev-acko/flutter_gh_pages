@@ -18,7 +18,11 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
+          flutter-version: '3.22.1'  # Replace with your local version
+          channel: stable
+
+      - name: Confirm Flutter Version
+        run: flutter --version
 
       - name: Get dependencies
         run: flutter pub get
@@ -44,6 +48,7 @@ jobs:
           TAG=$(git describe --tags --exact-match $COMMIT 2>/dev/null || echo null)
           IS_RELEASE=false
           if [ "$TAG" != "null" ]; then IS_RELEASE=true; fi
+
           echo "commit=$COMMIT" >> $GITHUB_OUTPUT
           echo "commitMessage=$MESSAGE" >> $GITHUB_OUTPUT
           echo "date=$DATE" >> $GITHUB_OUTPUT
@@ -51,25 +56,28 @@ jobs:
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "isRelease=$IS_RELEASE" >> $GITHUB_OUTPUT
 
-      - name: Download and update app_size.json
+      - name: Calculate size diff
+        id: size_diff
         run: |
           JSON_FILE="docs/app_size.json"
           if [ ! -f "$JSON_FILE" ]; then echo "[]" > "$JSON_FILE"; fi
-
-          # Get previous size for diff
           PREV_SIZE=$(jq '.[0].size // 0' "$JSON_FILE")
-          SIZE_DIFF=$((${{
-            steps.apk_size.outputs.apk_size
-          }} - $PREV_SIZE))
+          CURR_SIZE=${{ steps.apk_size.outputs.apk_size }}
+          SIZE_DIFF=$((CURR_SIZE - PREV_SIZE))
+          echo "prev_size=$PREV_SIZE" >> $GITHUB_OUTPUT
+          echo "size_diff=$SIZE_DIFF" >> $GITHUB_OUTPUT
 
-          # Create new entry
+      - name: Update app_size.json
+        run: |
+          JSON_FILE="docs/app_size.json"
+
           jq --arg commit "${{ steps.commit_info.outputs.commit }}" \
              --arg commitMessage "${{ steps.commit_info.outputs.commitMessage }}" \
              --arg date "${{ steps.commit_info.outputs.date }}" \
              --argjson size ${{ steps.apk_size.outputs.apk_size }} \
-             --argjson sizeDiff $SIZE_DIFF \
+             --argjson sizeDiff ${{ steps.size_diff.outputs.size_diff }} \
              --arg committer "${{ steps.commit_info.outputs.committer }}" \
-             --argjson isRelease "${{ steps.commit_info.outputs.isRelease }}" \
+             --argjson isRelease ${{ steps.commit_info.outputs.isRelease }} \
              --arg tag "${{ steps.commit_info.outputs.tag }}" \
              '. | [{"commit": $commit, "commitMessage": $commitMessage, "date": $date, "size": $size, "sizeDiff": $sizeDiff, "committer": $committer, "isRelease": $isRelease, "tag": ($tag == "null" ? null : $tag)}] + .' \
              "$JSON_FILE" > tmp.json && mv tmp.json "$JSON_FILE"
