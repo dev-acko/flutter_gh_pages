@@ -1,4 +1,4 @@
-name: Flutter Size Check
+name: Flutter AAB Size Check
 
 on:
   push:
@@ -24,24 +24,23 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Build APK with analyze-size
-        run: flutter build apk --release --analyze-size --target-platform android-arm64
+      - name: Build AAB (Android App Bundle)
+        run: flutter build appbundle --release
 
-      - name: Extract size from analyze-size report
-        id: apk_size
+      - name: Get AAB size
+        id: aab_size
         run: |
-          JSON_FILE=$(find ~/.flutter-devtools -name "apk-code-size-analysis_*.json" | head -n 1)
-          if [ -z "$JSON_FILE" ]; then
-            echo "No analyze-size JSON found"
+          AAB_PATH=$(find build/app/outputs/bundle/release/ -name "*.aab" | head -n 1)
+          if [ -z "$AAB_PATH" ]; then
+            echo "No AAB file found!"
             exit 1
           fi
-          
-          # Extract the total compressed size
-          SIZE=$(jq '.summary.totalCompressedBytes' "$JSON_FILE")
-          echo "Found size: $SIZE bytes from $JSON_FILE"
 
-          echo "apk_size=$SIZE" >> $GITHUB_OUTPUT
-          echo "report_file=$JSON_FILE" >> $GITHUB_OUTPUT
+          SIZE=$(stat -c %s "$AAB_PATH")
+          echo "Found AAB size: $SIZE bytes ($AAB_PATH)"
+
+          echo "aab_size=$SIZE" >> $GITHUB_OUTPUT
+          echo "aab_path=$AAB_PATH" >> $GITHUB_OUTPUT
 
       - name: Gather commit info
         id: commit_info
@@ -67,7 +66,7 @@ jobs:
           JSON_FILE="docs/app_size.json"
           if [ ! -f "$JSON_FILE" ]; then echo "[]" > "$JSON_FILE"; fi
           PREV_SIZE=$(jq '.[-1]?.size // 0' "$JSON_FILE")
-          CURR_SIZE=${{ steps.apk_size.outputs.apk_size }}
+          CURR_SIZE=${{ steps.aab_size.outputs.aab_size }}
           SIZE_DIFF=$((CURR_SIZE - PREV_SIZE))
           echo "prev_size=$PREV_SIZE" >> $GITHUB_OUTPUT
           echo "size_diff=$SIZE_DIFF" >> $GITHUB_OUTPUT
@@ -80,7 +79,7 @@ jobs:
              --arg commitMessage "${{ steps.commit_info.outputs.commitMessage }}" \
              --arg date "${{ steps.commit_info.outputs.date }}" \
              --arg committer "${{ steps.commit_info.outputs.committer }}" \
-             --argjson size ${{ steps.apk_size.outputs.apk_size }} \
+             --argjson size ${{ steps.aab_size.outputs.aab_size }} \
              --argjson sizeDiff ${{ steps.size_diff.outputs.size_diff }} \
              --arg isRelease "${{ steps.commit_info.outputs.isRelease }}" \
              '. + [{
