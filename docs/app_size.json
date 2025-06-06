@@ -52,5 +52,14 @@
     "sizeDiff": -26301849,
     "committer": "dev-acko",
     "isRelease": false
+  },
+  {
+    "commit": "eedec5571b2f87fbbcd6f5e448f9c68dca00745e",
+    "commitMessage": "fixed scrip aded size analyzer",
+    "date": "2025-06-06",
+    "size": null,
+    "sizeDiff": -6757769,
+    "committer": "dev-acko",
+    "isRelease": false
   }
 ]
