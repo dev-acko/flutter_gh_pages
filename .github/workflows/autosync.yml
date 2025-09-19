@@ -1,0 +1,42 @@
+name: Sync Branches
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [pre-prod, uat, dev-integration]
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Merge main into ${{ matrix.branch }}
+        run: |
+          git fetch origin ${{ matrix.branch }}
+          git checkout -b ${{ matrix.branch }} origin/${{ matrix.branch }}
+          git merge main
+
+      - name: Create sync PR
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: sync main into ${{ matrix.branch }}"
+          branch: sync/main-to-${{ matrix.branch }}
+          title: "Sync main into ${{ matrix.branch }}"
+          body: |
+            This PR was automatically created to keep `${{ matrix.branch }}` up-to-date with `main`.
+          base: ${{ matrix.branch }}
