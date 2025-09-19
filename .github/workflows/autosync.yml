@@ -3,28 +3,32 @@ name: Sync Branches
 on:
   push:
     branches:
-      - main  # Run only when main is updated
+      - main
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [pre-prod, uat, dev-integration]
+
+    permissions:
+      contents: write
+      pull-requests: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create sync PRs
+      - name: Create sync PR
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: sync main into target branch"
-          branch: sync/main-to-${{ github.run_id }}
+          commit-message: "chore: sync main into ${{ matrix.branch }}"
+          branch: sync/main-to-${{ matrix.branch }}
           delete-branch: true
           title: "Sync main into ${{ matrix.branch }}"
           body: |
             This PR was automatically created to keep `${{ matrix.branch }}` up-to-date with `main`.
           base: ${{ matrix.branch }}
-          # The head is always main
-          head: main
-    strategy:
-      matrix:
-        branch: [pre-prod, uat, dev-integration]
+          # No head override needed, it will use the branch created above
